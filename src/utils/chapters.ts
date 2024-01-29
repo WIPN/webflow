@@ -1,41 +1,15 @@
-import './utils/gravatar';
-import './utils/copyright';
-import '@finsweet/attributes-a11y';
-import '@finsweet/attributes-cmsselect';
-import '@finsweet/attributes-cmsfilter';
-import '@finsweet/attributes-cmssort';
-import '@finsweet/attributes-cmsload';
-import '@finsweet/attributes-selectcustom';
-import '@finsweet/cookie-consent';
-
-import { fetchMembers } from '$utils/members';
-import { updatePlanDetails } from '$utils/plan';
-
-import type { CMSFilters } from '../types/CMSFilters';
-import type { Member } from '../types/Member';
-
-const memberstack = window.$memberstackDom;
-/**
- * Get and replace the current plan details.
- */
-document.addEventListener('DOMContentLoaded', function () {
-  memberstack.getCurrentMember().then(({ data: member }) => {
-    updatePlanDetails(member);
-  });
-});
+import type { CMSList } from '../../types/CMSList';
+import type { Member } from '../../types/Member';
 
 /**
  * Populate CMS Data from an external API.
  */
 window.fsAttributes = window.fsAttributes || [];
 window.fsAttributes.push([
-  'cmsfilter',
-  async (filtersInstances: CMSFilters[]) => {
-    // Get the filters instance
-    const [filtersInstance] = filtersInstances;
-
+  'cmsload',
+  async (listInstances: CMSList[]) => {
     // Get the list instance
-    const { listInstance } = filtersInstance;
+    const [listInstance] = listInstances;
 
     // Save a copy of the template
     const [firstItem] = listInstance.items;
@@ -48,27 +22,31 @@ window.fsAttributes.push([
     listInstance.clearItems();
 
     // Create the new items
-    const newItems = members.map((member) => createItem(member, itemTemplateElement));
+    const newItems = members.map((member: Member) => createItem(member, itemTemplateElement));
 
     // Populate the list
     await listInstance.addItems(newItems);
-
-    // Get the template filter
-    const filterTemplateElement =
-      filtersInstance.form.querySelector<HTMLLabelElement>('[data-element="filter"]');
-    if (!filterTemplateElement) return;
-
-    // Get the parent wrapper
-    const filtersWrapper = filterTemplateElement.parentElement;
-    if (!filtersWrapper) return;
-
-    // Remove the template from the DOM
-    filterTemplateElement.remove();
-
-    // Sync the CMSFilters instance with the new created filters
-    // filtersInstance.storeFiltersData();
   },
 ]);
+
+/**
+ * Fetches members from MemberStack (using Cloudflare Worker Proxy)
+ * @returns An array of {@link Member}.
+ */
+const fetchMembers = async () => {
+  try {
+    // Retrieve the content of the element with `data-element="chapter-title"`
+    const chapterTitleElement = document.querySelector('[data-element="chapter-title"]');
+    const chapterTitle = chapterTitleElement ? chapterTitleElement.textContent : '';
+
+    const query = chapterTitle ? `?chapter=${encodeURIComponent(chapterTitle)}` : '';
+    const response = await fetch(`https://members.helpers.wipn.org/${query}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return error;
+  }
+};
 
 /**
  * Creates an item from the template element.
@@ -82,12 +60,14 @@ const createItem = (member: Member, templateElement: HTMLDivElement) => {
   const newItem = templateElement.cloneNode(true) as HTMLDivElement;
 
   // Query inner elements
+  const image = newItem.querySelector<HTMLImageElement>('[data-element="profile-image"]');
   const firstName = newItem.querySelector<HTMLSpanElement>('[data-element="first-name"]');
   const lastName = newItem.querySelector<HTMLSpanElement>('[data-element="last-name"]');
   const chapter = newItem.querySelector<HTMLParagraphElement>('[data-element="chapter"]');
   const company = newItem.querySelector<HTMLParagraphElement>('[data-element="company"]');
 
   // Populate inner elements
+  if (image) image.src = member.profileImage;
   if (firstName) firstName.textContent = member.firstName;
   if (lastName) lastName.textContent = member.lastName;
   if (chapter) {
@@ -106,6 +86,3 @@ const createItem = (member: Member, templateElement: HTMLDivElement) => {
 
   return newItem;
 };
-function whenLoaded(arg0: () => void, arg1: () => any) {
-  throw new Error('Function not implemented.');
-}

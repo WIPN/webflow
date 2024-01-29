@@ -52,6 +52,13 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@finsweet/attributes-a11y": "^1.1.3",
+    "@finsweet/attributes-cmsfilter": "^1.16.2",
+    "@finsweet/attributes-cmsload": "^1.12.0",
+    "@finsweet/attributes-cmsselect": "^1.7.0",
+    "@finsweet/attributes-cmssort": "^1.13.3",
+    "@finsweet/attributes-selectcustom": "^1.7.2",
+    "@finsweet/cookie-consent": "^1.13.2",
     "@finsweet/ts-utils": "^0.40.0",
     "js-sha256": "^0.11.0"
   },

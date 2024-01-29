@@ -1,5 +1,6 @@
 import type { CMSFilters } from './CMSFilters';
 import type { CMSList } from './CMSList';
+import type { Member } from './Member';
 
 /**
  * Window object.
@@ -13,9 +14,9 @@ declare global {
 
 type FsAttributesCallback =
   | [
-      'cmsload' | 'cmsnest' | 'cmscombine' | 'cmsprevnext' | 'cmsslider' | 'cmssort' | 'cmstabs',
-      (value: CMSList[]) => void
-    ]
+    'cmsload' | 'cmsnest' | 'cmscombine' | 'cmsprevnext' | 'cmsslider' | 'cmssort' | 'cmstabs',
+    (value: CMSList[]) => void
+  ]
   | ['cmsfilter', (value: CMSFilters[]) => void];
 
 type FsAttributesBase = {
