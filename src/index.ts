@@ -1,12 +1,6 @@
-import './utils/gravatar';
-import './utils/copyright';
-import '@finsweet/attributes-a11y';
-import '@finsweet/attributes-cmsselect';
-import '@finsweet/attributes-cmsfilter';
-import '@finsweet/attributes-cmssort';
-import '@finsweet/attributes-cmsload';
-import '@finsweet/attributes-selectcustom';
-import '@finsweet/cookie-consent';
+import '$utils/gravatar';
+import '$utils/copyright';
+import '$utils/customfields';
 
 import { fetchMembers } from '$utils/members';
 import { updatePlanDetails } from '$utils/plan';

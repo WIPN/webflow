@@ -13,7 +13,6 @@ interface MemberData {
   planConnections: PlanConnection[];
 }
 
-
 function formatDate(timestamp: number): string {
   const date = new Date(timestamp * 1000);
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -25,15 +24,19 @@ function updatePlanDetails(
   renewalSelector: string = '[data-element="plan-renewal"]'
 ): void {
   // Include plans that are either active or in TRIALING status
-  const relevantPlans = member.planConnections.filter(pc =>
-    (pc.active || pc.status === "TRIALING") && pc.payment && pc.payment.nextBillingDate
+  const relevantPlans = member.planConnections.filter(
+    (pc) => (pc.active || pc.status === 'TRIALING') && pc.payment && pc.payment.nextBillingDate
   );
 
   // Sort by nextBillingDate descending (most recent first)
-  const sortedPlans = relevantPlans.sort((a, b) => b.payment.nextBillingDate - a.payment.nextBillingDate);
+  const sortedPlans = relevantPlans.sort(
+    (a, b) => b.payment.nextBillingDate - a.payment.nextBillingDate
+  );
 
   // Take the first plan (most recent one)
   const currentPlan = sortedPlans[0];
+  console.log('current', currentPlan);
+  console.log('date', formatDate(currentPlan.payment.nextBillingDate));
 
   const priceElement = document.querySelector(priceSelector);
   const renewalElement = document.querySelector(renewalSelector);
@@ -55,57 +58,6 @@ function updatePlanDetails(
     if (renewalElement) {
       renewalElement.textContent = 'N/A';
     }
-  }
-}
-
-export { updatePlanDetails };
-
-/****************** */
-
-interface PlanConnection {
-  active: boolean;
-  status: string;
-  payment?: {
-    amount: number;
-    nextBillingDate: number; // Unix timestamp
-  };
-}
-
-interface MemberData {
-  planConnections: PlanConnection[];
-}
-
-function formatDate(timestamp: number): string {
-  const date = new Date(timestamp * 1000);
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-  console.log('date', date.toLocaleDateString('en-US', options));
-  return date.toLocaleDateString('en-US', options);
-}
-
-function updatePlanDetails(
-  member: MemberData,
-  priceSelector: string = '[data-element="plan-price"]',
-  renewalSelector: string = '[data-element="plan-renewal"]'
-): void {
-  console.log('plan member', member);
-  const activePlans = member.planConnections.filter((pc) => pc.active);
-  console.log('active plans', activePlans);
-  const currentPlan = activePlans[0]; // Assuming the first active plan is the current plan
-  console.log(currentPlan);
-
-  const priceElement = document.querySelector(priceSelector);
-  const renewalElement = document.querySelector(renewalSelector);
-
-  if (priceElement) {
-    priceElement.textContent =
-      currentPlan && currentPlan.payment ? `$${currentPlan.payment.amount}` : 'Free';
-  }
-
-  if (renewalElement) {
-    renewalElement.textContent =
-      currentPlan && currentPlan.payment && currentPlan.payment.nextBillingDate
-        ? formatDate(currentPlan.payment.nextBillingDate)
-        : 'N/A';
   }
 }
 
