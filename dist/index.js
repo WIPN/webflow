@@ -1,1 +1,172 @@
-"use strict";(()=>{async function p(e){let t=`https://gravatar.helpers.wipn.org/?email=${encodeURIComponent(e)}`;document.querySelectorAll('[data-element="gravatar"]').forEach(r=>{r.src=t})}document.addEventListener("DOMContentLoaded",function(){window.$memberstackDom.getCurrentMember().then(({data:e})=>{e&&e.auth.email&&p(e.auth.email)})});function f(e='[data-element="copyright"]'){let n=new Date().getFullYear(),t=document.querySelector(e);t&&(t.textContent=n.toString())}document.addEventListener("DOMContentLoaded",function(){f()});(function(){document.addEventListener("DOMContentLoaded",function(){let e=localStorage.getItem("_ms-mem"),n=e?JSON.parse(e):{};document.querySelectorAll("[ms-code-customfield]").forEach(o=>{let r=o.getAttribute("ms-code-customfield");if(r)if(r.startsWith("!")){let a=r.slice(1);n.customFields&&n.customFields[a]&&o.parentNode?.removeChild(o)}else(!n.customFields||!n.customFields[r])&&o.parentNode?.removeChild(o)})})})();async function l(e){try{return await(await fetch(`https://members.helpers.wipn.org/${e}`)).json()}catch(n){return n}}function d(e){let n=new Date(e*1e3),t={year:"numeric",month:"long",day:"numeric"};return n.toLocaleDateString("en-US",t)}function u(e,n='[data-element="plan-price"]',t='[data-element="plan-renewal"]'){let a=e.planConnections.filter(i=>(i.active||i.status==="TRIALING")&&i.payment&&i.payment.nextBillingDate).sort((i,c)=>c.payment.nextBillingDate-i.payment.nextBillingDate)[0];console.log("current",a),console.log("date",d(a.payment.nextBillingDate));let s=document.querySelector(n),m=document.querySelector(t);if(a&&a.payment){if(s&&(s.textContent=`$${a.payment.amount}`),m){let i=d(a.payment.nextBillingDate);m.textContent=i}}else s&&(s.textContent="Free"),m&&(m.textContent="N/A")}var g=window.$memberstackDom;document.addEventListener("DOMContentLoaded",function(){g.getCurrentMember().then(({data:e})=>{u(e)})});window.fsAttributes=window.fsAttributes||[];window.fsAttributes.push(["cmsfilter",async e=>{let[n]=e,{listInstance:t}=n,[o]=t.items,r=o.element,a=await l();t.clearItems();let s=a.map(c=>y(c,r));await t.addItems(s);let m=n.form.querySelector('[data-element="filter"]');!m||!m.parentElement||m.remove()}]);var y=(e,n)=>{let t=n.cloneNode(!0),o=t.querySelector('[data-element="first-name"]'),r=t.querySelector('[data-element="last-name"]'),a=t.querySelector('[data-element="chapter"]'),s=t.querySelector('[data-element="company"]');return o&&(o.textContent=e.firstName),r&&(r.textContent=e.lastName),a&&(a.textContent="National Virtual",e.chapter&&(a.textContent=e.chapter)),s&&(e.company?s.textContent=e.company:s.style.display="none"),t};})();
+"use strict";
+(() => {
+  // bin/live-reload.js
+  new EventSource(`${"http://localhost:3000"}/esbuild`).addEventListener("change", () => location.reload());
+
+  // src/utils/gravatar.ts
+  async function updateGravatarImages(email) {
+    const encodedEmail = encodeURIComponent(email);
+    const endpoint = `https://gravatar.helpers.wipn.org/?email=${encodedEmail}`;
+    const gravatarImages = document.querySelectorAll('[data-element="gravatar"]');
+    gravatarImages.forEach((image) => {
+      image.src = endpoint;
+    });
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+    window.$memberstackDom.getCurrentMember().then(({ data: member }) => {
+      if (member && member.auth.email) {
+        updateGravatarImages(member.auth.email);
+      }
+    });
+  });
+
+  // src/utils/copyright.ts
+  function updateCopyright(selector = '[data-element="copyright"]') {
+    const currentYear = (/* @__PURE__ */ new Date()).getFullYear();
+    const copyrightDateElement = document.querySelector(selector);
+    if (copyrightDateElement) {
+      copyrightDateElement.textContent = currentYear.toString();
+    }
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+    updateCopyright();
+  });
+
+  // src/utils/customfields.ts
+  (function() {
+    document.addEventListener("DOMContentLoaded", function() {
+      const msMemString = localStorage.getItem("_ms-mem");
+      const msMem = msMemString ? JSON.parse(msMemString) : {};
+      const elements = document.querySelectorAll("[ms-code-customfield]");
+      elements.forEach((element) => {
+        const customField = element.getAttribute("ms-code-customfield");
+        if (customField) {
+          if (customField.startsWith("!")) {
+            const actualCustomField = customField.slice(1);
+            if (msMem.customFields && msMem.customFields[actualCustomField]) {
+              element.parentNode?.removeChild(element);
+            }
+          } else {
+            if (!msMem.customFields || !msMem.customFields[customField]) {
+              element.parentNode?.removeChild(element);
+            }
+          }
+        }
+      });
+    });
+  })();
+
+  // src/utils/members.ts
+  async function fetchMembers(query) {
+    try {
+      const response = await fetch(`https://members.helpers.wipn.org/${query}`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  // src/utils/plan.ts
+  function formatDate(timestamp) {
+    const date = new Date(timestamp * 1e3);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString("en-US", options);
+  }
+  function updatePlanDetails(member, priceSelector = '[data-element="plan-price"]', renewalSelector = '[data-element="plan-renewal"]', statusSelector = '[data-element="plan-status"]') {
+    const relevantPlans = member.planConnections.filter(
+      (pc) => (pc.active || pc.status === "TRIALING") && pc.payment && pc.payment.nextBillingDate
+    );
+    const sortedPlans = relevantPlans.sort((a, b) => {
+      if (a === void 0 || b === void 0) {
+        return 0;
+      }
+      if (a.payment !== void 0 || b.payment !== void 0) {
+        return b.payment.nextBillingDate - a.payment.nextBillingDate;
+      }
+      return 0;
+    });
+    const currentPlan = sortedPlans[0];
+    const priceElement = document.querySelector(priceSelector);
+    const renewalElement = document.querySelector(renewalSelector);
+    const statusElement = document.querySelector(statusSelector);
+    if (currentPlan && currentPlan.payment) {
+      if (priceElement) {
+        priceElement.textContent = `$${currentPlan.payment.amount}`;
+      }
+      if (renewalElement) {
+        const formattedDate = formatDate(currentPlan.payment.nextBillingDate);
+        renewalElement.textContent = formattedDate;
+      }
+      if (statusElement) {
+        statusElement.textContent = currentPlan.active ? "Active" : "Inactive";
+      }
+    } else {
+      if (priceElement) {
+        priceElement.textContent = "Free";
+      }
+      if (renewalElement) {
+        renewalElement.textContent = "N/A";
+      }
+    }
+  }
+
+  // src/index.ts
+  var memberstack = window.$memberstackDom;
+  document.addEventListener("DOMContentLoaded", function() {
+    memberstack.getCurrentMember().then(({ data: member }) => {
+      if (member) {
+        updatePlanDetails(member);
+      }
+    });
+  });
+  window.fsAttributes = window.fsAttributes || [];
+  window.fsAttributes.push([
+    "cmsfilter",
+    async (filtersInstances) => {
+      const [filtersInstance] = filtersInstances;
+      if (!filtersInstance)
+        return;
+      const { listInstance } = filtersInstance;
+      const [firstItem] = listInstance.items;
+      const itemTemplateElement = firstItem.element;
+      const members = await fetchMembers();
+      listInstance.clearItems();
+      const newItems = members.map((member) => createItem(member, itemTemplateElement));
+      await listInstance.addItems(newItems);
+      const filterTemplateElement = filtersInstance.form.querySelector('[data-element="filter"]');
+      if (!filterTemplateElement)
+        return;
+      const filtersWrapper = filterTemplateElement.parentElement;
+      if (!filtersWrapper)
+        return;
+      filterTemplateElement.remove();
+    }
+  ]);
+  var createItem = (member, templateElement) => {
+    const newItem = templateElement.cloneNode(true);
+    const firstName = newItem.querySelector('[data-element="first-name"]');
+    const lastName = newItem.querySelector('[data-element="last-name"]');
+    const chapter = newItem.querySelector('[data-element="chapter"]');
+    const company = newItem.querySelector('[data-element="company"]');
+    if (firstName)
+      firstName.textContent = member.firstName;
+    if (lastName)
+      lastName.textContent = member.lastName;
+    if (chapter) {
+      chapter.textContent = "National Virtual";
+      if (member.chapter) {
+        chapter.textContent = member.chapter;
+      }
+    }
+    if (company) {
+      if (member.company) {
+        company.textContent = member.company;
+      } else {
+        company.style.display = "none";
+      }
+    }
+    return newItem;
+  };
+})();
+//# sourceMappingURL=index.js.map

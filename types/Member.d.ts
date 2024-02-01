@@ -1,20 +1,19 @@
 export interface CustomFields {
-    'first-name': string;
-    'last-name': string;
-    chapter?: string; // Optional if not all members have a chapter
-    company?: string; // Optional if not all members have a company
+  'first-name': string;
+  'last-name': string;
+  chapter?: string; // Optional if not all members have a chapter
+  company?: string; // Optional if not all members have a company
 }
 
 export interface Auth {
-    email: string;
+  email: string;
 }
 
 export interface Member {
-    fullName: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    chapter?: string;
-    company?: string;
-    profileImage?: string; // Optional if not all members have a profile image
+  fullName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  chapter?: string;
+  company?: string;
 }

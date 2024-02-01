@@ -1,20 +1,20 @@
 {
-  "name": "@finsweet/developer-starter",
-  "version": "0.0.0",
-  "description": "Developer starter template for Finsweet projects.",
-  "homepage": "https://github.com/finsweet/developer-starter#readme",
+  "name": "@pmsi/wipn",
+  "version": "0.0.1",
+  "description": "Webflow Helper Utilities for WIPN.",
+  "homepage": "https://github.com/pmsi/wipn",
   "license": "ISC",
   "keywords": [],
   "author": {
-    "name": "Finsweet",
-    "url": "https://finsweet.com/"
+    "name": "PMSI",
+    "url": "https://pmsimarketinggroup.com/"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/finsweet/developer-starter.git"
+    "url": "git+https://github.com/pmsi/wipn.git"
   },
   "bugs": {
-    "url": "https://github.com/finsweet/developer-starter/issues"
+    "url": "https://github.com/pmsi/wipn/issues"
   },
   "type": "module",
   "main": "src/index.ts",
@@ -35,30 +35,23 @@
     "update": "pnpm update -i -L -r"
   },
   "devDependencies": {
-    "@changesets/changelog-git": "^0.1.14",
-    "@changesets/cli": "^2.26.2",
+    "@changesets/changelog-git": "^0.2.0",
+    "@changesets/cli": "^2.27.1",
     "@finsweet/eslint-config": "^2.0.6",
     "@finsweet/tsconfig": "^1.3.3",
-    "@playwright/test": "^1.39.0",
-    "@typescript-eslint/eslint-plugin": "^6.10.0",
-    "@typescript-eslint/parser": "^6.10.0",
+    "@playwright/test": "^1.41.1",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@typescript-eslint/parser": "^6.20.0",
     "cross-env": "^7.0.3",
-    "esbuild": "^0.19.5",
-    "eslint": "^8.53.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "prettier": "^3.1.0",
-    "typescript": "^5.2.2"
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@finsweet/attributes-a11y": "^1.1.3",
-    "@finsweet/attributes-cmsfilter": "^1.16.2",
-    "@finsweet/attributes-cmsload": "^1.12.0",
-    "@finsweet/attributes-cmsselect": "^1.7.0",
-    "@finsweet/attributes-cmssort": "^1.13.3",
-    "@finsweet/attributes-selectcustom": "^1.7.2",
-    "@finsweet/cookie-consent": "^1.13.2",
     "@finsweet/ts-utils": "^0.40.0",
     "js-sha256": "^0.11.0"
   },

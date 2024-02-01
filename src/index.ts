@@ -14,7 +14,9 @@ const memberstack = window.$memberstackDom;
  */
 document.addEventListener('DOMContentLoaded', function () {
   memberstack.getCurrentMember().then(({ data: member }) => {
-    updatePlanDetails(member);
+    if (member) {
+      updatePlanDetails(member);
+    }
   });
 });
 
@@ -22,11 +24,13 @@ document.addEventListener('DOMContentLoaded', function () {
  * Populate CMS Data from an external API.
  */
 window.fsAttributes = window.fsAttributes || [];
+
 window.fsAttributes.push([
   'cmsfilter',
   async (filtersInstances: CMSFilters[]) => {
     // Get the filters instance
     const [filtersInstance] = filtersInstances;
+    if (!filtersInstance) return;
 
     // Get the list instance
     const { listInstance } = filtersInstance;

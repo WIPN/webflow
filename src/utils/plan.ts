@@ -21,7 +21,8 @@ function formatDate(timestamp: number): string {
 function updatePlanDetails(
   member: MemberData,
   priceSelector: string = '[data-element="plan-price"]',
-  renewalSelector: string = '[data-element="plan-renewal"]'
+  renewalSelector: string = '[data-element="plan-renewal"]',
+  statusSelector: string = '[data-element="plan-status"]'
 ): void {
   // Include plans that are either active or in TRIALING status
   const relevantPlans = member.planConnections.filter(
@@ -29,17 +30,24 @@ function updatePlanDetails(
   );
 
   // Sort by nextBillingDate descending (most recent first)
-  const sortedPlans = relevantPlans.sort(
-    (a, b) => b.payment.nextBillingDate - a.payment.nextBillingDate
-  );
+  const sortedPlans = relevantPlans.sort((a, b) => {
+    if (a === undefined || b === undefined) {
+      return 0; // or return a value based on your sorting requirements
+    }
+
+    if (a.payment !== undefined || b.payment !== undefined) {
+      return b.payment.nextBillingDate - a.payment.nextBillingDate;
+    }
+
+    return 0;
+  });
 
   // Take the first plan (most recent one)
   const currentPlan = sortedPlans[0];
-  console.log('current', currentPlan);
-  console.log('date', formatDate(currentPlan.payment.nextBillingDate));
 
   const priceElement = document.querySelector(priceSelector);
   const renewalElement = document.querySelector(renewalSelector);
+  const statusElement = document.querySelector(statusSelector);
 
   if (currentPlan && currentPlan.payment) {
     if (priceElement) {
@@ -49,6 +57,10 @@ function updatePlanDetails(
     if (renewalElement) {
       const formattedDate = formatDate(currentPlan.payment.nextBillingDate);
       renewalElement.textContent = formattedDate;
+    }
+
+    if (statusElement) {
+      statusElement.textContent = currentPlan.active ? 'Active' : 'Inactive';
     }
   } else {
     // Handle case where there is no current plan or payment details
