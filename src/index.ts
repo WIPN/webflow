@@ -46,7 +46,7 @@ window.fsAttributes.push([
     listInstance.clearItems();
 
     // Create the new items
-    const newItems = members.map((member) => createItem(member, itemTemplateElement));
+    const newItems = members.map((member) => createMemberCard(member, itemTemplateElement));
 
     // Populate the list
     await listInstance.addItems(newItems);
@@ -75,7 +75,7 @@ window.fsAttributes.push([
  *
  * @returns A new Collection Item element.
  */
-const createItem = (member: Member, templateElement: HTMLDivElement) => {
+const createMemberCard = (member: Member, templateElement: HTMLDivElement) => {
   // Clone the template element
   const newItem = templateElement.cloneNode(true) as HTMLDivElement;
 
@@ -104,6 +104,3 @@ const createItem = (member: Member, templateElement: HTMLDivElement) => {
 
   return newItem;
 };
-function whenLoaded(arg0: () => void, arg1: () => any) {
-  throw new Error('Function not implemented.');
-}
