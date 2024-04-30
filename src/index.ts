@@ -27,18 +27,18 @@ if (!memberstack) {
     }
 
     // Get MemberStack metadata
-    if (member && member.metaData) {
-      // For each metaData field, get the value and set the display style
-      Object.keys(member.metaData).forEach((key) => {
-        const value = member.metaData[key];
+    // if (member && member.metaData) {
+    //   // For each metaData field, get the value and set the display style
+    //   Object.keys(member.metaData).forEach((key) => {
+    //     const value = member.metaData[key];
 
-        const elements = document.querySelectorAll(`[data-ms-metadata:${key}]`);
+    //     const elements = document.querySelectorAll(`[data-ms-metadata:${key}]`);
 
-        elements.forEach((element) => {
-          element.style.display = element.getAttribute(`data-ms-metadata:${key}`) === value ? 'block' : 'none';
-        });
-      });
-    }
+    //     elements.forEach((element) => {
+    //       element.style.display = element.getAttribute(`data-ms-metadata:${key}`) === value ? 'block' : 'none';
+    //     });
+    //   });
+    // }
   });
 }
 
