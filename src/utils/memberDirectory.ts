@@ -85,28 +85,28 @@ async function createMemberCard(member: Member, templateElement: HTMLDivElement)
 
   // If the member has a publicly visible company, populate the element, otherwise hide it
   if (company) {
+    company.style.display = 'none';
     if (member.company) {
       company.textContent = member.company;
-    } else {
-      company.style.display = 'none';
+      company.style.display = 'block';
     }
   }
 
   // If the member has a publicly visible location, populate the element, otherwise hide it
   if (location) {
+    location.style.display = 'none';
     if (member.location) {
       location.textContent = member.location;
-    } else {
-      location.style.display = 'none';
+      location.style.display = 'block';
     }
   }
 
   // If the member has a publicly visible phone number, populate the element, otherwise hide it
   if (phone) {
+    phone.style.display = 'none';
     if (member.phone) {
       phone.textContent = member.phone;
-    } else {
-      phone.style.display = 'none';
+      phone.style.display = 'block';
     }
   }
 

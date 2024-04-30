@@ -3,6 +3,8 @@ export interface CustomFields {
   'last-name': string;
   chapter?: string; // Optional if not all members have a chapter
   company?: string; // Optional if not all members have a company
+  location?: string; // Optional if not all members have a location
+  phone?: string; // Optional if not all members have a phone number
 }
 
 export interface Auth {
