@@ -39,8 +39,9 @@ export function membersFilters() {
       listInstance.addItems(newItems);
 
       // Get the template filter
-      const filterTemplateElement =
-        filtersInstance.form.querySelector<HTMLLabelElement>('[data-element="filter"]');
+      const filterTemplateElement = filtersInstance.form.querySelector<HTMLLabelElement>(
+        '[data-element="members-filter"]'
+      );
       if (!filterTemplateElement) return;
 
       // Get the parent wrapper
