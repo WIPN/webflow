@@ -18,7 +18,7 @@ function formatDate(timestamp: number): string {
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
   return date.toLocaleDateString('en-US', options);
 }
-function updatePlanDetails(
+export function displayPlanDetails(
   member: MemberData,
   priceSelector: string = '[data-element="plan-price"]',
   renewalSelector: string = '[data-element="plan-renewal"]',
@@ -35,7 +35,7 @@ function updatePlanDetails(
       return 0; // or return a value based on your sorting requirements
     }
 
-    if (a.payment !== undefined || b.payment !== undefined) {
+    if (a.payment !== undefined && b.payment !== undefined) {
       return b.payment.nextBillingDate - a.payment.nextBillingDate;
     }
 
@@ -72,5 +72,3 @@ function updatePlanDetails(
     }
   }
 }
-
-export { updatePlanDetails };

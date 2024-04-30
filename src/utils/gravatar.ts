@@ -11,6 +11,11 @@ export async function updateGravatarImages(email: string) {
   });
 }
 
+export async function getGravatar(email: string) {
+  const encodedEmail = encodeURIComponent(email);
+  return `https://gravatar.helpers.wipn.org/?email=${encodedEmail}`;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   // Example usage with MemberStack
   window.$memberstackDom.getCurrentMember().then(({ data: member }) => {

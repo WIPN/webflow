@@ -1,1 +1,218 @@
-"use strict";(()=>{async function f(e){let n=`https://gravatar.helpers.wipn.org/?email=${encodeURIComponent(e)}`;document.querySelectorAll('[data-element="gravatar"]').forEach(r=>{r.src=n})}document.addEventListener("DOMContentLoaded",function(){window.$memberstackDom.getCurrentMember().then(({data:e})=>{e&&e.auth.email&&f(e.auth.email)})});function y(e='[data-element="copyright"]'){let t=new Date().getFullYear(),n=document.querySelector(e);n&&(n.textContent=t.toString())}document.addEventListener("DOMContentLoaded",function(){y()});(function(){document.addEventListener("DOMContentLoaded",function(){let e=localStorage.getItem("_ms-mem"),t=e?JSON.parse(e):{};document.querySelectorAll("[ms-code-customfield]").forEach(a=>{let r=a.getAttribute("ms-code-customfield");if(r)if(r.startsWith("!")){let i=r.slice(1);t.customFields&&t.customFields[i]&&a.parentNode?.removeChild(a)}else(!t.customFields||!t.customFields[r])&&a.parentNode?.removeChild(a)})})})();async function u(e){try{return await(await fetch(`https://members.helpers.wipn.org/${e}`)).json()}catch(t){return t}}function g(e){let t=new Date(e*1e3),n={year:"numeric",month:"long",day:"numeric"};return t.toLocaleDateString("en-US",n)}function p(e,t='[data-element="plan-price"]',n='[data-element="plan-renewal"]',a='[data-element="plan-status"]'){let o=e.planConnections.filter(s=>(s.active||s.status==="TRIALING")&&s.payment&&s.payment.nextBillingDate).sort((s,d)=>s===void 0||d===void 0?0:s.payment!==void 0||d.payment!==void 0?d.payment.nextBillingDate-s.payment.nextBillingDate:0)[0],c=document.querySelector(t),m=document.querySelector(n),l=document.querySelector(a);if(o&&o.payment){if(c&&(c.textContent=`$${o.payment.amount}`),m){let s=g(o.payment.nextBillingDate);m.textContent=s}l&&(l.textContent=o.active?"Active":"Inactive")}else c&&(c.textContent="Free"),m&&(m.textContent="N/A")}var C=window.$memberstackDom;document.addEventListener("DOMContentLoaded",function(){C.getCurrentMember().then(({data:e})=>{e&&p(e)})});window.fsAttributes=window.fsAttributes||[];window.fsAttributes.push(["cmsfilter",async e=>{let[t]=e;if(!t)return;let{listInstance:n}=t,[a]=n.items,r=a.element,i=await u();n.clearItems();let o=i.map(l=>M(l,r));await n.addItems(o);let c=t.form.querySelector('[data-element="filter"]');!c||!c.parentElement||c.remove()}]);var M=(e,t)=>{let n=t.cloneNode(!0),a=n.querySelector('[data-element="first-name"]'),r=n.querySelector('[data-element="last-name"]'),i=n.querySelector('[data-element="chapter"]'),o=n.querySelector('[data-element="company"]');return a&&(a.textContent=e.firstName),r&&(r.textContent=e.lastName),i&&(i.textContent="National Virtual",e.chapter&&(i.textContent=e.chapter)),o&&(e.company?o.textContent=e.company:o.style.display="none"),n};})();
+"use strict";
+(() => {
+  // bin/live-reload.js
+  new EventSource(`${"http://localhost:3000"}/esbuild`).addEventListener("change", () => location.reload());
+
+  // src/utils/gravatar.ts
+  async function updateGravatarImages(email) {
+    const encodedEmail = encodeURIComponent(email);
+    const endpoint = `https://gravatar.helpers.wipn.org/?email=${encodedEmail}`;
+    const gravatarImages = document.querySelectorAll('[data-element="gravatar"]');
+    gravatarImages.forEach((image) => {
+      image.src = endpoint;
+    });
+  }
+  async function getGravatar(email) {
+    const encodedEmail = encodeURIComponent(email);
+    return `https://gravatar.helpers.wipn.org/?email=${encodedEmail}`;
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+    window.$memberstackDom.getCurrentMember().then(({ data: member }) => {
+      if (member && member.auth.email) {
+        updateGravatarImages(member.auth.email);
+      }
+    });
+  });
+
+  // src/utils/copyright.ts
+  function updateCopyright(selector = '[data-element="copyright"]') {
+    const currentYear = (/* @__PURE__ */ new Date()).getFullYear();
+    const copyrightDateElement = document.querySelector(selector);
+    if (copyrightDateElement) {
+      copyrightDateElement.textContent = currentYear.toString();
+    }
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+    updateCopyright();
+  });
+
+  // src/utils/customfields.ts
+  (function() {
+    document.addEventListener("DOMContentLoaded", function() {
+      const msMemString = localStorage.getItem("_ms-mem");
+      const msMem = msMemString ? JSON.parse(msMemString) : {};
+      const elements = document.querySelectorAll("[ms-code-customfield]");
+      elements.forEach((element) => {
+        const customField = element.getAttribute("ms-code-customfield");
+        if (customField) {
+          if (customField.startsWith("!")) {
+            const actualCustomField = customField.slice(1);
+            if (msMem.customFields && msMem.customFields[actualCustomField]) {
+              element.parentNode?.removeChild(element);
+            }
+          } else {
+            if (!msMem.customFields || !msMem.customFields[customField]) {
+              element.parentNode?.removeChild(element);
+            }
+          }
+        }
+      });
+    });
+  })();
+
+  // src/utils/members.ts
+  async function fetchMembers(query) {
+    try {
+      let url = "https://members.helpers.wipn.org/";
+      url += query ? query : "";
+      const response = await fetch(url);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  // src/utils/memberDirectory.ts
+  function membersFilters() {
+    window.fsAttributes = window.fsAttributes || [];
+    window.fsAttributes.push([
+      "cmsfilter",
+      async (filtersInstances) => {
+        const [filtersInstance] = filtersInstances;
+        if (!filtersInstance)
+          return;
+        const { listInstance } = filtersInstance;
+        const [firstItem] = listInstance.items;
+        const itemTemplateElement = firstItem.element;
+        const members = await fetchMembers();
+        listInstance.clearItems();
+        const newItemsPromises = members.map(
+          (member) => createMemberCard(member, itemTemplateElement)
+        );
+        const newItems = await Promise.all(newItemsPromises);
+        listInstance.addItems(newItems);
+        const filterTemplateElement = filtersInstance.form.querySelector('[data-element="filter"]');
+        if (!filterTemplateElement)
+          return;
+        const filtersWrapper = filterTemplateElement.parentElement;
+        if (!filtersWrapper)
+          return;
+        filterTemplateElement.remove();
+      }
+    ]);
+  }
+  async function createMemberCard(member, templateElement) {
+    const newItem = templateElement.cloneNode(true);
+    const firstName = newItem.querySelector('[data-element="first-name"]');
+    const lastName = newItem.querySelector('[data-element="last-name"]');
+    const chapter = newItem.querySelector('[data-element="chapter"]');
+    const company = newItem.querySelector('[data-element="company"]');
+    const location2 = newItem.querySelector('[data-element="location"]');
+    const phone = newItem.querySelector('[data-element="phone"]');
+    const profileImage = newItem.querySelector('[data-element="profile-image"]');
+    if (firstName)
+      firstName.textContent = member.firstName;
+    if (lastName)
+      lastName.textContent = member.lastName;
+    if (chapter) {
+      chapter.textContent = "National Virtual";
+      if (member.chapter) {
+        chapter.textContent = member.chapter;
+      }
+    }
+    if (company) {
+      if (member.company) {
+        company.textContent = member.company;
+      } else {
+        company.style.display = "none";
+      }
+    }
+    if (location2) {
+      if (member.location) {
+        location2.textContent = member.location;
+      } else {
+        location2.style.display = "none";
+      }
+    }
+    if (phone) {
+      if (member.phone) {
+        phone.textContent = member.phone;
+      } else {
+        phone.style.display = "none";
+      }
+    }
+    if (profileImage) {
+      profileImage.src = await getGravatar(member.email);
+    }
+    return newItem;
+  }
+
+  // src/utils/plan.ts
+  function formatDate(timestamp) {
+    const date = new Date(timestamp * 1e3);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString("en-US", options);
+  }
+  function displayPlanDetails(member, priceSelector = '[data-element="plan-price"]', renewalSelector = '[data-element="plan-renewal"]', statusSelector = '[data-element="plan-status"]') {
+    const relevantPlans = member.planConnections.filter(
+      (pc) => (pc.active || pc.status === "TRIALING") && pc.payment && pc.payment.nextBillingDate
+    );
+    const sortedPlans = relevantPlans.sort((a, b) => {
+      if (a === void 0 || b === void 0) {
+        return 0;
+      }
+      if (a.payment !== void 0 && b.payment !== void 0) {
+        return b.payment.nextBillingDate - a.payment.nextBillingDate;
+      }
+      return 0;
+    });
+    const currentPlan = sortedPlans[0];
+    const priceElement = document.querySelector(priceSelector);
+    const renewalElement = document.querySelector(renewalSelector);
+    const statusElement = document.querySelector(statusSelector);
+    if (currentPlan && currentPlan.payment) {
+      if (priceElement) {
+        priceElement.textContent = `$${currentPlan.payment.amount}`;
+      }
+      if (renewalElement) {
+        const formattedDate = formatDate(currentPlan.payment.nextBillingDate);
+        renewalElement.textContent = formattedDate;
+      }
+      if (statusElement) {
+        statusElement.textContent = currentPlan.active ? "Active" : "Inactive";
+      }
+    } else {
+      if (priceElement) {
+        priceElement.textContent = "Free";
+      }
+      if (renewalElement) {
+        renewalElement.textContent = "N/A";
+      }
+    }
+  }
+
+  // src/index.ts
+  window.membersFilters = membersFilters || [];
+  var memberstack = window.$memberstackDom;
+  if (!memberstack) {
+    throw new Error("MemberStack is not available.");
+  } else {
+    memberstack.getCurrentMember().then(({ data: member }) => {
+      if (member) {
+        displayPlanDetails(member);
+      }
+      if (member && member.metaData) {
+        Object.keys(member.metaData).forEach((key) => {
+          const value = member.metaData[key];
+          const elements = document.querySelectorAll(`[data-ms-metadata:${key}]`);
+          elements.forEach((element) => {
+            element.style.display = element.getAttribute(`data-ms-metadata:${key}`) === value ? "block" : "none";
+          });
+        });
+      }
+    });
+  }
+  window.fsAttributes = window.fsAttributes || [];
+})();
+//# sourceMappingURL=index.js.map

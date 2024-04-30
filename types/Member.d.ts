@@ -16,4 +16,6 @@ export interface Member {
   email: string;
   chapter?: string;
   company?: string;
+  location?: string;
+  phone?: string;
 }
