@@ -46,3 +46,24 @@ if (!memberstack) {
  * Populate CMS Data from an external API.
  */
 window.fsAttributes = window.fsAttributes || [];
+
+/**
+ * Conditional Parameters Hiding/Showing Elements
+ */
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+if (urlParams.has('action')) {
+  // Get all the elements that have the `data-action` attribute
+  const elements = document.querySelectorAll<HTMLElement>('[data-action]');
+  // For each element with the `data-action` attribute
+  elements.forEach((element) => {
+    // Show the element if the action value is equal to the URL parameter
+    if (element.getAttribute('data-action') === urlParams.get('action')) {
+      element.style.display = 'block';
+    }
+    // Hide the element if the action value is not equal to the URL parameter
+    else if (element.getAttribute('data-action') === `!${urlParams.get('action')}`) {
+      element.style.display = 'none';
+    }
+  });
+}
